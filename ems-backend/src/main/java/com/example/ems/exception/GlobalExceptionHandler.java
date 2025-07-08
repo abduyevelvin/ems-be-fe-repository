@@ -17,12 +17,14 @@ public class GlobalExceptionHandler {
 
     private static final Map<Class<? extends Exception>, ErrorCode> ERROR_CODE_MAP = Map.of(
             ResourceAlreadyExistsException.class, ErrorCode.ALREADY_EXISTS,
-            ResourceNotFoundException.class, ErrorCode.NOT_FOUND
+            ResourceNotFoundException.class, ErrorCode.NOT_FOUND,
+            InvalidCredentialsException.class, ErrorCode.INVALID_CREDENTIALS
     );
 
     private static final Map<Class<? extends Exception>, HttpStatus> STATUS_MAP = Map.of(
             ResourceAlreadyExistsException.class, CONFLICT,
-            ResourceNotFoundException.class, NOT_FOUND
+            ResourceNotFoundException.class, NOT_FOUND,
+            InvalidCredentialsException.class, UNAUTHORIZED
     );
 
     @ExceptionHandler(Exception.class)
