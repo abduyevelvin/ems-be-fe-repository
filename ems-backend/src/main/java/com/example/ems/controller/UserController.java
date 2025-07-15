@@ -4,11 +4,15 @@ import com.example.ems.model.LoginResponse;
 import com.example.ems.model.SaveUserRequest;
 import com.example.ems.model.UpdateUserRequest;
 import com.example.ems.model.UserResponse;
+import com.example.ems.security.AuthenticatedUser;
 import com.example.ems.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -33,6 +37,26 @@ public class UserController {
         var loginResponse = userService.login(request);
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        boolean isAdmin = authenticatedUser.getAuthorities()
+                                           .stream()
+                                           .anyMatch(a -> a.getAuthority()
+                                                           .equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } else {
+            var currentUser = userService.getAllUsers()
+                                         .stream()
+                                         .filter(u -> u.username()
+                                                       .equals(authenticatedUser.getUsername()))
+                                         .toList();
+            return ResponseEntity.ok(currentUser);
+        }
     }
 
     @PatchMapping("/{userId}")

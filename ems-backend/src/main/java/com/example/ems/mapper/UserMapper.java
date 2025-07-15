@@ -8,6 +8,7 @@ import com.example.ems.model.SaveUserRequest;
 import com.example.ems.model.UserResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class UserMapper {
 
     private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public static UserEntity toEntity(SaveUserRequest request) {
+    public static UserEntity toUserEntity(SaveUserRequest request) {
         if (request == null) {
             return null;
         }
@@ -31,7 +32,7 @@ public class UserMapper {
                          .build();
     }
 
-    public static UserResponse toResponse(UserEntity entity) {
+    public static UserResponse toUserResponse(UserEntity entity) {
         if (entity == null) {
             return null;
         }
@@ -50,5 +51,15 @@ public class UserMapper {
                                            .collect(Collectors.toSet())
                                    : java.util.Collections.emptySet())
                            .build();
+    }
+
+    public static List<UserResponse> toUserResponseList(List<UserEntity> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return List.of();
+        }
+
+        return entities.stream()
+                       .map(UserMapper::toUserResponse)
+                       .collect(Collectors.toList());
     }
 }

@@ -14,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static com.example.ems.mapper.UserMapper.toEntity;
-import static com.example.ems.mapper.UserMapper.toResponse;
+import java.util.List;
+
+import static com.example.ems.mapper.UserMapper.*;
 
 @Slf4j
 @Service
@@ -37,12 +38,19 @@ public class UserServiceImpl implements UserService {
             throw new ResourceAlreadyExistsException("User with username " + request.username() + " already exists");
         }
 
-        return toResponse(userRepository.save(toEntity(request)));
+        return toUserResponse(userRepository.save(toUserEntity(request)));
     }
 
     @Override
     public LoginResponse login(SaveUserRequest request) {
+
         return authService.login(request);
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+
+        return toUserResponseList(userRepository.findAll());
     }
 
     @Override
@@ -57,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
         existingUser.setGroup(groupEntity);
 
-        return toResponse(userRepository.save(existingUser));
+        return toUserResponse(userRepository.save(existingUser));
     }
 
     @Override
@@ -68,6 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserEntity findUserByIdOrThrow(String userId) {
+
         return userRepository.findById(userId)
                              .orElseThrow(() -> new ResourceNotFoundException("User with ID " + userId + " not found"));
     }

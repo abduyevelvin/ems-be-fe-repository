@@ -5,6 +5,7 @@ import com.example.ems.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // This endpoint allows you to create a new employee in the DB with the provided details.
+    @PreAuthorize("hasAuthority('CREATE')")
     @PostMapping
     public ResponseEntity<EmployeeDto> createEmployee(@RequestBody @Valid EmployeeDto employeeDto) {
         var employee = employeeService.createEmployee(employeeDto);
@@ -27,15 +28,7 @@ public class EmployeeController {
                              .body(employee);
     }
 
-    // This endpoint retrieves an employee by its id from the DB.
-    @GetMapping("{id}")
-    public ResponseEntity<EmployeeDto> getEmployee(@PathVariable("id") Long employeeId) {
-        var employee = employeeService.getEmployeeById(employeeId);
-
-        return ResponseEntity.ok(employee);
-    }
-
-    // This endpoint retrieves all employees from the DB.
+    @PreAuthorize("hasAuthority('LIST')")
     @GetMapping
     public ResponseEntity<List<EmployeeDto>> getEmployees() {
         var employees = employeeService.getAllEmployees();
@@ -43,7 +36,15 @@ public class EmployeeController {
         return ResponseEntity.ok(employees);
     }
 
-    // This endpoint updates an existing employee in the DB with the provided details.
+    @PreAuthorize("hasAuthority('LIST')")
+    @GetMapping("{id}")
+    public ResponseEntity<EmployeeDto> getEmployee(@PathVariable("id") Long employeeId) {
+        var employee = employeeService.getEmployeeById(employeeId);
+
+        return ResponseEntity.ok(employee);
+    }
+
+    @PreAuthorize("hasAuthority('EDIT')")
     @PutMapping("{id}")
     public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
                                                       @RequestBody @Valid EmployeeDto employeeDto) {
@@ -52,7 +53,7 @@ public class EmployeeController {
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    // This endpoint deletes an employee by its id from the DB.
+    @PreAuthorize("hasAuthority('DELETE')")
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long employeeId) {
         employeeService.deleteEmployee(employeeId);
