@@ -1,5 +1,6 @@
 package com.example.ems.security;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuthenticatedUser implements UserDetails {
 
+    @Getter
+    private final String userId;
     private final String username;
     private final Set<? extends GrantedAuthority> authorities;
 

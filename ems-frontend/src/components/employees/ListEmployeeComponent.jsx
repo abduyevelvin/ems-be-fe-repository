@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { deleteEmployee, listEmployees } from '../services/EmployeeService'
+import { deleteEmployee, listEmployees } from '../../services/employees/EmployeeService'
 import { useNavigate } from 'react-router-dom'
 
 const ListEmployeeComponent = () => {
 
     const [employees, setEmployees] = useState([])
+    const [errorMessage, setErrorMessage] = useState("")
 
     const navigator = useNavigate()
 
@@ -15,8 +16,14 @@ const ListEmployeeComponent = () => {
     function getAllEmployees() {
         listEmployees().then((response) => {
             setEmployees(response.data)
+            setErrorMessage("")
         }).catch(error => {
-            console.error()
+            if (error.response && error.response.status === 403) {
+                setErrorMessage("Access denied: You are not authorized to view employees.")
+            } else {
+                setErrorMessage("An error occurred while fetching employees.")
+            }
+            console.error(error)
         })
     }
 
@@ -38,34 +45,45 @@ const ListEmployeeComponent = () => {
         }
     }
 
+    function isAdmin() {
+        return localStorage.getItem('group') === 'ADMIN';
+    }
+
     return (
         <div className='container'>
+            {errorMessage && (
+                <div className='alert alert-danger' role='alert'>
+                    {errorMessage}
+                </div>
+            )}
             <h2 className='text-center'>List of Employees</h2>
-            <button className='btn btn-primary mb-2' onClick={addNewEmployee}>
-                Add Employee
-            </button>
+            {isAdmin() && (
+                <button className='btn btn-primary mb-2' onClick={addNewEmployee}>
+                    Add Employee
+                </button>
+            )}
             <table className='table table-striped table-bordered'>
                 <thead>
                     <tr>
-                        <th>Employee Id</th>
                         <th>Employee First Name</th>
                         <th>Employee Last Name</th>
                         <th>Employee Email</th>
-                        <th>Actions</th>
+                        {isAdmin() && <th>Actions</th>}
                     </tr>
                 </thead>
                 <tbody>
                     {
                         employees.map(employee =>
                             <tr key={employee.employeeId}>
-                                <td>{employee.employeeId}</td>
                                 <td>{employee.firstName}</td>
                                 <td>{employee.lastName}</td>
                                 <td>{employee.email}</td>
-                                <td>
-                                    <button className='btn btn-info ms-2' onClick={() => updateEmployee(employee.employeeId)}><i className='bi bi-pencil-square'></i> Update</button>
-                                    <button className='btn btn-danger ms-2' onClick={() => removeEmployee(employee.employeeId)}><i className='bi bi-trash3'></i> Delete</button>
-                                </td>
+                                {isAdmin() && (
+                                    <td>
+                                        <button className='btn btn-info ms-2' onClick={() => updateEmployee(employee.employeeId)}><i className='bi bi-pencil-square'></i> Update</button>
+                                        <button className='btn btn-danger ms-2' onClick={() => removeEmployee(employee.employeeId)}><i className='bi bi-trash3'></i> Delete</button>
+                                    </td>
+                                )}
                             </tr>
                         )
                     }

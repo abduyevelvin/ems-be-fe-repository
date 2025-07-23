@@ -42,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                  .getBody();
 
                 var username = claims.getSubject();
+                var userId = claims.get("userId", String.class);
                 var permissions = (List<String>) claims.get("permissions", List.class);
 
                 var authorities = new HashSet<SimpleGrantedAuthority>();
@@ -56,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authorities.add(new SimpleGrantedAuthority("ROLE_" + group));
                 }
 
-                var authenticatedUser = new AuthenticatedUser(username, authorities);
+                var authenticatedUser = new AuthenticatedUser(userId, username, authorities);
 
                 var authentication =
                         new UsernamePasswordAuthenticationToken(authenticatedUser, null, authorities);

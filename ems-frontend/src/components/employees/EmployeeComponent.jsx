@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { createEmployee, getEmployee, updateEmployee } from '../services/EmployeeService'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { createEmployee, getEmployee, updateEmployee } from '../../services/employees/EmployeeService'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const EmployeeComponent = () => {
 
@@ -15,6 +15,8 @@ const EmployeeComponent = () => {
         lastName: '',
         email: ''
     })
+
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleLastName = (e) => setLastName(e.target.value)
 
@@ -77,6 +79,8 @@ const EmployeeComponent = () => {
                         error.response.data.message.includes('Employee already exists with email')
                     ) {
                         setErrors(prev => ({ ...prev, email: 'Employee with this email already exists' }))
+                    } else if (error.response && error.response.status === 403) {
+                        setErrorMessage('Access denied: You are not authorized to create employees.')
                     } else {
                         console.error(error)
                     }
@@ -132,6 +136,7 @@ const EmployeeComponent = () => {
 
     return (
         <div className='container'>
+            {errorMessage && <div className='alert alert-danger'>{errorMessage}</div>}
             <div className='row'>
                 <div className='card'>
                     {

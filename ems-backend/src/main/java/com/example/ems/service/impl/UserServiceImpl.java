@@ -54,6 +54,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserById(String userId) {
+        var user = findUserByIdOrThrow(userId);
+
+        return toUserResponse(user);
+    }
+
+    @Override
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         var existingUser = findUserByIdOrThrow(userId);
 

@@ -1,6 +1,7 @@
 package com.example.ems.service.impl;
 
 import com.example.ems.entity.PermissionEntity;
+import com.example.ems.enums.GroupType;
 import com.example.ems.exception.InvalidCredentialsException;
 import com.example.ems.exception.ResourceNotFoundException;
 import com.example.ems.model.LoginResponse;
@@ -39,8 +40,8 @@ public class AuthServiceImpl {
             throw new InvalidCredentialsException("Invalid username or password");
         }
 
-        String group = user.getGroup()
-                           .getName();
+        var group = user.getGroup()
+                        .getName();
         var permissions = user.getGroup()
                               .getPermissions()
                               .stream()
@@ -49,6 +50,7 @@ public class AuthServiceImpl {
 
         var token = Jwts.builder()
                         .setSubject(user.getUserName())
+                        .claim("userId", user.getId())
                         .claim("group", group)
                         .claim("permissions", permissions)
                         .setIssuedAt(new Date())
@@ -56,6 +58,6 @@ public class AuthServiceImpl {
                         .signWith(SignatureAlgorithm.HS256, jwtSecret)
                         .compact();
 
-        return new LoginResponse(user.getUserName(), token);
+        return new LoginResponse(user.getUserName(), token, GroupType.valueOf(group), permissions);
     }
 }
