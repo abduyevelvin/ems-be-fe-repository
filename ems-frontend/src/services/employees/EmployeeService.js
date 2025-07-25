@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const REST_API_BASE_URL = 'http://localhost:8181/api/v1/employees'
+const REST_API_BASE_URL = 'http://localhost:8080/api/v1/employees'
 
 function getAuthHeader() {
     const token = localStorage.getItem('token')

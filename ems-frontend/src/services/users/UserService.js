@@ -1,15 +1,16 @@
 import axios from 'axios';
 
-const USER_API_BASE_URL = 'http://localhost:8181/api/v1/users';
+const USER_API_BASE_URL = 'http://localhost:8080/api/v1/users';
+const AUTH_API_BASE_URL = 'http://localhost:8080/api/v1/auth';
 
 function getAuthHeader() {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-export const loginUser = (loginData) => axios.post(`${USER_API_BASE_URL}/login`, loginData)
+export const loginUser = (loginData) => axios.post(`${AUTH_API_BASE_URL}/login`, loginData);
 
-export const registerUser = (registerData) => axios.post(`${USER_API_BASE_URL}/register`, registerData)
+export const registerUser = (registerData) => axios.post(`${AUTH_API_BASE_URL}/register`, registerData);
 
 export function listUsers() {
     return axios.get(USER_API_BASE_URL, {
